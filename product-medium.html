@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تفاصيل الطلب - تيراميسو وسط</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f3e2ce;
+      color: #a07161;
+      padding: 20px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    .language-btn {
+      background-color: #f3e2ce;
+      color: #a07161;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+    .product-img {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+    h2 {
+      margin: 0 0 10px;
+    }
+    .price {
+      font-size: 18px;
+      margin: 10px 0;
+    }
+    .qty {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 15px 0;
+    }
+    .qty button {
+      background-color: #a07161;
+      color: #f3e2ce;
+      border: none;
+      padding: 6px 12px;
+      font-size: 18px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .qty span {
+      font-size: 18px;
+      padding: 0 15px;
+    }
+    textarea {
+      width: 100%;
+      height: 80px;
+      margin-top: 15px;
+      border-radius: 6px;
+      border: 1px solid #d4c4b2;
+      padding: 10px;
+      font-size: 14px;
+      resize: none;
+    }
+    .add-btn {
+      margin-top: 20px;
+      width: 100%;
+      background-color: #a07161;
+      color: #f3e2ce;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .add-btn:hover {
+      background-color: #a57666;
+    }
+    .success {
+      display: none;
+      margin-top: 15px;
+      color: green;
+      font-weight: bold;
+      text-align: center;
+    }
+    .back-btn {
+      margin-top: 25px;
+      text-align: center;
+    }
+    .back-btn a {
+      text-decoration: none;
+      color: #a07161;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+ 
+<header>
+  <h1 id="title">تفاصيل الطلب</h1>
+  <button class="language-btn" onclick="toggleLang()">عربي | English</button>
+</header>
+ 
+<div class="container">
+  <img src="https://via.placeholder.com/500x300?text=Tiramisu+Medium" class="product-img" />
+  <h2 id="productName">تيراميسو وسط</h2>
+  <p class="price" id="price">السعر: 15 دينار</p>
+ 
+  <div class="qty">
+    <span id="qtyLabel">الكمية:</span>
+    <div>
+      <button onclick="changeQty(-1)">-</button>
+      <span id="quantity">1</span>
+      <button onclick="changeQty(1)">+</button>
+    </div>
+  </div>
+ 
+  <textarea id="notes" placeholder="ملاحظات (اختياري)"></textarea>
+  <button class="add-btn" onclick="submitOrder()">أضف الطلب</button>
+  <div class="success" id="successMessage">✅ تم الطلب بنجاح</div>
+ 
+  <div class="back-btn">
+    <a href="index.html">← الرجوع للرئيسية</a>
+  </div>
+</div>
+ 
+<script>
+  let qty = 1;
+  let isArabic = true;
+  const pricePerUnit = 15;
+ 
+  function changeQty(amount) {
+    qty = Math.max(1, qty + amount);
+    document.getElementById("quantity").textContent = qty;
+    document.getElementById("price").textContent = isArabic
+      ? "السعر: " + (qty * pricePerUnit) + " دينار"
+      : "Price: " + (qty * pricePerUnit) + " JOD";
+  }
+ 
+  function submitOrder() {
+    const order = {
+      name: document.getElementById("productName").textContent,
+      quantity: qty,
+      unitPrice: pricePerUnit,
+      notes: document.getElementById("notes").value
+    };
+    const existing = JSON.parse(localStorage.getItem("orders") || "[]");
+    existing.push(order);
+    localStorage.setItem("orders", JSON.stringify(existing));
+    document.getElementById("successMessage").style.display = "block";
+  }
+ 
+  function toggleLang() {
+    isArabic = !isArabic;
+    document.documentElement.lang = isArabic ? "ar" : "en";
+    document.documentElement.dir = isArabic ? "rtl" : "ltr";
+    document.querySelector(".language-btn").textContent = isArabic ? "عربي | English" : "English | عربي";
+    document.getElementById("title").textContent = isArabic ? "تفاصيل الطلب" : "Order Details";
+    document.getElementById("productName").textContent = isArabic ? "تيراميسو وسط" : "Tiramisu Medium";
+    document.getElementById("price").textContent = isArabic
+      ? "السعر: " + (qty * pricePerUnit) + " دينار"
+      : "Price: " + (qty * pricePerUnit) + " JOD";
+    document.getElementById("qtyLabel").textContent = isArabic ? "الكمية:" : "Quantity:";
+    document.querySelector(".add-btn").textContent = isArabic ? "أضف الطلب" : "Add to Order";
+    document.getElementById("notes").placeholder = isArabic ? "ملاحظات (اختياري)" : "Notes (optional)";
+    document.getElementById("successMessage").textContent = isArabic ? "✅ تم الطلب بنجاح" : "✅ Order placed successfully";
+    document.querySelector(".back-btn a").textContent = isArabic ? "← الرجوع للرئيسية" : "← Back to Home";
+  }
+</script>
+ 
+</body>
+</html>

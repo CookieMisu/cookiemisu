@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>طلبات الزبون</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f3e2ce;
+      color: #a07161;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .order {
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .order p {
+      margin: 6px 0;
+    }
+    .delete-btn {
+      background-color: #a07161;
+      color: #f3e2ce;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    .delete-btn:hover {
+      background-color: #a57666;
+    }
+    .no-orders {
+      text-align: center;
+      font-size: 18px;
+      margin-top: 40px;
+      color: #7b5c4c;
+    }
+    .total {
+      font-size: 18px;
+      margin: 20px 0;
+      text-align: center;
+      font-weight: bold;
+    }
+    .form {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      margin: 20px auto;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      margin-bottom: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    .confirm-btn {
+      background-color: #a07161;
+      color: #f3e2ce;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 16px;
+    }
+    .confirm-btn:hover {
+      background-color: #a57666;
+    }
+    .back-btn {
+      margin-top: 30px;
+      text-align: center;
+    }
+    .back-btn a {
+      text-decoration: none;
+      color: #a07161;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+ 
+  <h1>طلباتك الحالية</h1>
+  <div id="ordersContainer"></div>
+  <div class="total" id="totalPrice"></div>
+ 
+  <div class="form">
+    <h3>معلومات التواصل</h3>
+    <label>الاسم:</label>
+    <input type="text" id="name" placeholder="اكتب اسمك" />
+    <label>رقم الهاتف:</label>
+    <input type="tel" id="phone" placeholder="مثال: 0791234567" />
+    <button class="confirm-btn" onclick="confirmOrder()">تأكيد الطلب</button>
+  </div>
+ 
+  <div class="back-btn">
+    <a href="index.html">← الرجوع للرئيسية</a>
+  </div>
+ 
+<script>
+  let orders = JSON.parse(localStorage.getItem("orders") || "[]");
+ 
+  function loadOrders() {
+    const container = document.getElementById("ordersContainer");
+    const totalDiv = document.getElementById("totalPrice");
+    container.innerHTML = "";
+    let total = 0;
+ 
+    if (orders.length === 0) {
+      container.innerHTML = '<div class="no-orders">لا يوجد طلبات حالياً</div>';
+      totalDiv.textContent = "";
+      return;
+    }
+ 
+    orders.forEach((order, index) => {
+      const div = document.createElement("div");
+      div.className = "order";
+      const subtotal = order.quantity * order.unitPrice;
+      total += subtotal;
+ 
+      div.innerHTML = `
+        <p><strong>المنتج:</strong> ${order.name}</p>
+        <p><strong>الكمية:</strong> ${order.quantity}</p>
+        <p><strong>السعر للوحدة:</strong> ${order.unitPrice} دينار</p>
+        <p><strong>الملاحظات:</strong> ${order.notes || "لا يوجد"}</p>
+        <button class="delete-btn" onclick="deleteOrder(${index})">🗑 حذف</button>
+      `;
+      container.appendChild(div);
+    });
+ 
+    totalDiv.textContent = `المجموع الكلي: ${total} دينار`;
+  }
+ 
+  function deleteOrder(index) {
+    orders.splice(index, 1);
+    localStorage.setItem("orders", JSON.stringify(orders));
+    loadOrders();
+  }
+ 
+  function confirmOrder() {
+    const name = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+ 
+    if (!name || !phone) {
+      alert("يرجى إدخال الاسم ورقم الهاتف قبل تأكيد الطلب.");
+      return;
+    }
+ 
+    const orderId = "ORD-" + Math.floor(1000 + Math.random() * 9000);
+    sessionStorage.setItem("confirmedOrderId", orderId);
+    sessionStorage.setItem("customerName", name);
+    sessionStorage.setItem("customerPhone", phone);
+ 
+    localStorage.removeItem("orders");
+    window.location.href = "thankyoupage.html";
+  }
+ 
+  loadOrders();
+</script>
+ 
+</body>
+</html>
